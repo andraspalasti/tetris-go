@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
-
 func main() {
-	fmt.Println("Hello world!")
+	game := NewGame()
+
+	// game loop
+	for true {
+		switch {
+			case :
+				game.Move(Left)
+			case :
+				game.Move(Right)
+			case :
+				game.Move(Down)
+		}
+	}
 }
