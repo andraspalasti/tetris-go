@@ -1,6 +1,9 @@
 package game
 
-import "math/rand"
+import (
+	"github.com/nsf/termbox-go"
+	"math/rand"
+)
 
 type Dir int
 
@@ -59,4 +62,15 @@ func (t *Tetromino) RotateBack() {
 	if t.rot < 0 {
 		t.rot = len(t.blocks) - 1
 	}
+}
+
+var colorToAttr = map[Color]termbox.Attribute{
+	Cyan:   termbox.ColorCyan,
+	Blue:   termbox.ColorBlue,
+	Orange: termbox.ColorYellow,
+	Yellow: termbox.ColorLightYellow,
+	Green:  termbox.ColorGreen,
+	Purple: termbox.ColorMagenta,
+	Red:    termbox.ColorRed,
+	None:   termbox.ColorDefault,
 }

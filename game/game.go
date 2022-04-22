@@ -1,5 +1,7 @@
 package game
 
+import "github.com/nsf/termbox-go"
+
 type game struct {
 	score    uint
 	curPiece *Tetromino
@@ -55,7 +57,8 @@ func (g *game) MovePiece(dir Dir) {
 func (g *game) Draw() {
 	for y, row := range g.board {
 		for x, color := range row {
-			tbprint(x*2, y, colorToAttr[color], colorToAttr[color], " .")
+			termbox.SetCell(x*2, y, ' ', colorToAttr[color], colorToAttr[color])
+			termbox.SetCell(x*2+1, y, '.', colorToAttr[color], colorToAttr[color])
 		}
 	}
 
@@ -64,7 +67,8 @@ func (g *game) Draw() {
 	for i := uint16(0x8000); i != 0; i = i >> 1 {
 		if (blocks & i) != 0 {
 			x, y := g.offset.x+dx, g.offset.y+dy
-			tbprint(x*2, y, colorToAttr[g.curPiece.color], colorToAttr[g.curPiece.color], "  ")
+			termbox.SetCell(x*2, y, ' ', colorToAttr[g.curPiece.color], colorToAttr[g.curPiece.color])
+			termbox.SetCell(x*2+1, y, ' ', colorToAttr[g.curPiece.color], colorToAttr[g.curPiece.color])
 		}
 		if dx++; dx == 4 {
 			dx = 0
