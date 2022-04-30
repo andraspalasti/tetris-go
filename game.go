@@ -1,6 +1,7 @@
 package main
 
 type game struct {
+	hasLost  bool
 	score    uint
 	curPiece *tetromino
 	offset   struct{ x, y int }
@@ -11,10 +12,11 @@ func NewGame() *game {
 	width, height := 10, 20
 
 	g := game{
+		hasLost:  false,
 		score:    0,
 		curPiece: NewTetromino(),
 		board:    make([][]Color, height),
-		offset:   struct{ x, y int }{width/2 -1, 0}}
+		offset:   struct{ x, y int }{width/2 - 1, 0}}
 
 	for i := range g.board {
 		g.board[i] = make([]Color, width)
@@ -38,7 +40,7 @@ func (g *game) Width() int {
 // Moves the current piece in the game to the left
 // The move only occurs if there is space for the piece
 func (g *game) MoveLeft() {
-	if !g.isOccupied(g.offset.x-1, g.offset.y) {
+	if !g.hasLost && !g.isOccupied(g.offset.x-1, g.offset.y) {
 		g.offset.x--
 	}
 }
@@ -46,7 +48,7 @@ func (g *game) MoveLeft() {
 // Moves the current piece in the game to the right
 // The move only occurs if there is space for the piece
 func (g *game) MoveRight() {
-	if !g.isOccupied(g.offset.x+1, g.offset.y) {
+	if !g.hasLost && !g.isOccupied(g.offset.x+1, g.offset.y) {
 		g.offset.x++
 	}
 }
@@ -54,20 +56,30 @@ func (g *game) MoveRight() {
 // Moves the current piece in the game down
 // The move only occurs if there is space for the piece
 func (g *game) MoveDown() {
-	if !g.isOccupied(g.offset.x, g.offset.y+1) {
+	if !g.hasLost && !g.isOccupied(g.offset.x, g.offset.y+1) {
 		g.offset.y++
 	}
 }
 
+// Rotates the current piece if it can be rotated
 func (g *game) RotatePiece() {
+	if g.hasLost {
+		return
+	}
+
 	g.curPiece.Rotate()
 	if g.isOccupied(g.offset.x, g.offset.y) {
 		g.curPiece.RotateBack()
 	}
 }
 
+// It makes the game tick, if it wasn't obvious already
 func (g *game) Tick() {
-	// if we can move the piece down
+	if g.hasLost {
+		return
+	}
+
+	// move the piece down if we can
 	if !g.isOccupied(g.offset.x, g.offset.y+1) {
 		g.offset.y++
 		return
@@ -81,9 +93,17 @@ func (g *game) Tick() {
 	g.removeFullRows()
 	g.curPiece = NewTetromino()
 	g.offset.x, g.offset.y = len(g.board[0])/2-1, 0
+	if g.isOccupied(g.offset.x, g.offset.y) {
+		g.hasLost = true
+	}
 }
 
+// Removes the rows from the board that are full of colors
 func (g *game) removeFullRows() {
+	if g.hasLost {
+		return
+	}
+
 rowLoop:
 	for i, row := range g.board {
 		// if its not a full row continue
