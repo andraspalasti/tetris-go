@@ -1,11 +1,12 @@
 package main
 
 type game struct {
-	hasLost  bool
-	score    uint
-	curPiece *tetromino
-	offset   struct{ x, y int }
-	board    [][]Color
+	hasLost   bool
+	score     uint
+	curPiece  *tetromino
+	nextPiece *tetromino
+	offset    struct{ x, y int }
+	board     [][]Color
 }
 
 func NewGame() *game {
@@ -15,6 +16,7 @@ func NewGame() *game {
 		hasLost:  false,
 		score:    0,
 		curPiece: NewTetromino(),
+		nextPiece: NewTetromino(),
 		board:    make([][]Color, height),
 		offset:   struct{ x, y int }{width/2 - 1, 0}}
 
@@ -91,7 +93,8 @@ func (g *game) Tick() {
 	}
 
 	g.removeFullRows()
-	g.curPiece = NewTetromino()
+	g.curPiece = g.nextPiece
+	g.nextPiece = NewTetromino()
 	g.offset.x, g.offset.y = len(g.board[0])/2-1, 0
 	if g.isOccupied(g.offset.x, g.offset.y) {
 		g.hasLost = true
